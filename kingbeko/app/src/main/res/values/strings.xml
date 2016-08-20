@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">kingbeko</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="title">べこ国王とお話！</string>
+</resources>
