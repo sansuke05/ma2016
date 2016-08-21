@@ -9,6 +9,7 @@ import org.json.JSONObject;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -24,10 +25,11 @@ public class HttpAsyncLoader extends AsyncTaskLoader<JSONObject>{
     //音声認識,AIサーバーへデータ送受信,音声合成
 
     private URL url = null;
-    String phrase = null;
+    String inputPhrase = "";
 
-    public HttpAsyncLoader(Context context,String urltext){
+    public HttpAsyncLoader(Context context,String urltext,String inputPhrase){
         super(context);
+        this.inputPhrase = inputPhrase;
         try {
             this.url = new URL(urltext);
         } catch (MalformedURLException e){
@@ -36,28 +38,30 @@ public class HttpAsyncLoader extends AsyncTaskLoader<JSONObject>{
     }
 
     @Override
-    public JSONObject loadInBackground(){
+    public JSONObject loadInBackground() {
 
         HttpURLConnection con = null;
+        DataOutputStream os = null;
 
         try {
             con = (HttpURLConnection)url.openConnection();
             con.setDoInput(true);
             con.setDoOutput(true);
 
+            con.setUseCaches(false);
+
             con.setChunkedStreamingMode(0);
 
             con.setRequestMethod("POST");
             con.setRequestProperty("Connection", "Keep-Alive");
-            con.setRequestProperty("Context-Type",String.format("text/plain; "));
-            con.setRequestProperty("Context-Length",String.valueOf());
 
-            con.connect();
+            String postData = "message=" + inputPhrase;
+            os = new DataOutputStream(con.getOutputStream());
+            os.writeBytes(postData);
 
-            final int status = con.getResponseCode();
+            int status = con.getResponseCode();
             if (status == HttpURLConnection.HTTP_OK){
                 //通信に成功
-
 
                 //JSONを取得
                 BufferedInputStream in = new BufferedInputStream(con.getInputStream());
@@ -74,14 +78,16 @@ public class HttpAsyncLoader extends AsyncTaskLoader<JSONObject>{
 
                 in.close();
                 return json;
+            } else {
+                throw new ConnectException(String.valueOf(status));
             }
 
             //Thread.sleep(1000);
-        } catch (MalformedURLException e1){
-            e1.printStackTrace();
-        } catch (ProtocolException e1){
+        } catch (ConnectException e1){
             e1.printStackTrace();
         } catch (JSONException e1){
+            e1.printStackTrace();
+        } catch (MalformedURLException e1){
             e1.printStackTrace();
         } catch (IOException e1){
             e1.printStackTrace();
@@ -93,5 +99,11 @@ public class HttpAsyncLoader extends AsyncTaskLoader<JSONObject>{
         }
 
         return null;
+    }
+}
+
+class ConnectException extends Exception {
+    public ConnectException(String msg) {
+        super(msg);
     }
 }

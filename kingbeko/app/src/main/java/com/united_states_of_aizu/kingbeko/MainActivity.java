@@ -11,6 +11,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import org.json.JSONException;
@@ -43,8 +44,9 @@ public class MainActivity extends AppCompatActivity
     @Override
     public Loader<JSONObject> onCreateLoader(int id, Bundle args) {
         String urltext = "https://king-beco.herokuapp.com/talk";
+        EditText editText = (EditText)findViewById(R.id.editText);
 
-        HttpAsyncLoader httpAsyncLoader = new HttpAsyncLoader(this,urltext);
+        HttpAsyncLoader httpAsyncLoader = new HttpAsyncLoader(this,urltext,editText.getText().toString());
         httpAsyncLoader.forceLoad();
         return httpAsyncLoader;
     }
