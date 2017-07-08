@@ -1,3 +1,5 @@
-# ma2016
+# ma2016 作品名：キングべこ
 
-MashupAward 2016
+MashupAward2016Aizu　にて制作したキングべこのAndroidアプリのリポジトリになります。
+
+作品の詳細については[こちら](http://hacklog.jp/works/48099)。
